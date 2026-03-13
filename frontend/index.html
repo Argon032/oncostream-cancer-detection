@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OncoStream — Medical Imaging Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">
+      <div class="logo-mark"></div>
+      <span>OncoStream</span>
+    </div>
+  </nav>
+
+  <main>
+    <!-- UPLOAD PAGE {PAGE 1} --> 
+    <div id="page-upload">
+
+      <div class="hero-header">
+        <div>
+          <div class="hero-eyebrow">Medical Imaging Intelligence</div>
+          <h1 class="hero-title">Upload. Analyze.<br><em>Understand.</em></h1>
+          <p class="hero-desc">Upload a medical image for AI-assisted classification using ResNet50 and Swin Transformer architectures with Grad-CAM visualization.</p>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-pill">
+            <div class="stat-val">ResNet50</div>
+            <div class="stat-lbl">CNN Architecture</div>
+          </div>
+          <div class="stat-pill">
+            <div class="stat-val">Swin-T</div>
+            <div class="stat-lbl">Transformer Model</div>
+          </div>
+          <div class="stat-pill">
+            <div class="stat-val">Grad-CAM</div>
+            <div class="stat-lbl">Visual Explainability</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="upload-section">
+
+        <!-- DROPZONE AREA -->
+        <div class="upload-main">
+          <div class="section-label">Step 01 : Upload Image</div>
+
+          <div class="dropzone" id="dropzone">
+            <input type="file" id="file-input" accept="image/png, image/jpeg, image/jpg" />
+
+            <div class="upload-prompt" style="display:flex;flex-direction:column;align-items:center;gap:20px;">
+              <div class="dz-icon">
+                <svg viewBox="0 0 24 24">
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                  <polyline points="17 8 12 3 7 8"/>
+                  <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+              </div>
+              <div class="dz-text">
+                <strong>Drop your image here</strong>
+                <span>or click anywhere to browse</span>
+              </div>
+              <div class="dz-formats">
+                <span class="fmt-tag">PNG</span>
+                <span class="fmt-tag">JPG</span>
+                <span class="fmt-tag">JPEG</span>
+              </div>
+            </div>
+
+            <div class="preview-wrapper" id="preview-wrapper">
+              <img class="preview-img" id="preview-img" src="" alt="Preview" />
+              <div class="preview-name" id="preview-name">filename.jpg</div>
+              <span class="preview-change" id="preview-change">Change image</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SIDEBAR -->
+        <div class="upload-sidebar">
+
+          <div class="section-label">Step 02 : Configure</div>
+
+          <!-- DATASET SELECT -->
+          <div class="field-group">
+            <div class="field-label">Dataset Type</div>
+            <div class="dataset-options" id="dataset-options">
+
+              <label class="dataset-option selected" data-val="brain">
+                <input type="radio" name="dataset" value="brain" checked>
+                <div class="dataset-dot"></div>
+                <div class="dataset-info">
+                  <strong>Brain MRI</strong>
+                  <span>Glioma · Meningioma · Pituitary · No Tumor</span>
+                </div>
+                <span class="dataset-badge badge-brain">4 CLASSES</span>
+              </label>
+
+              <label class="dataset-option" data-val="breast">
+                <input type="radio" name="dataset" value="breast">
+                <div class="dataset-dot"></div>
+                <div class="dataset-info">
+                  <strong>Breast Histopathology</strong>
+                  <span>Benign · Malignant</span>
+                </div>
+                <span class="dataset-badge badge-breast">2 CLASSES</span>
+              </label>
+
+            </div>
+          </div>
+
+          <!-- MODEL SELECT -->
+          <div class="field-group">
+            <div class="field-label">Model Architecture</div>
+            <div class="model-select-wrap">
+              <select id="model-select">
+                <option value="resnet">ResNet50 (CNN)</option>
+                <option value="swin">Swin Transformer</option>
+                <option value="ensemble">Ensemble (Both)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- NOTICE -->
+          <div class="notice-card">
+            <svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <p>Results include a Grad-CAM heatmap highlighting regions influencing the prediction.</p>
+          </div>
+
+          <!-- SUBMIT -->
+          <button class="btn-analyze" id="btn-analyze" onclick="runAnalysis()">
+            <svg viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="M21 21l-4.35-4.35"/>
+            </svg>
+            Run Analysis
+          </button>
+
+        </div>
+      </div>
+    </div>
+
+
+    <!-- RESULT PAGE {PAGE 2} -->
+    <div id="page-result">
+
+      <div class="result-header">
+        <div class="result-header-left">
+          <button class="back-btn" onclick="goBack()">
+            <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            New analysis
+          </button>
+          <h2 class="result-title">Analysis Complete</h2>
+          <div class="result-meta">
+            Model: <span id="r-model">ResNet50</span>&nbsp;&nbsp;
+            Dataset: <span id="r-dataset">Brain MRI</span>
+          </div>
+        </div>
+        <div class="result-timestamp" id="r-timestamp"></div>
+      </div>
+
+      <div class="result-body">
+
+        <!-- LEFT: prediction + breakdown -->
+        <div class="result-left">
+
+          <!-- PREDICTION CARD -->
+          <div class="prediction-card">
+            <div class="pc-label">Primary Diagnosis</div>
+            <div class="pc-diagnosis" id="r-diagnosis">Glioma</div>
+            <div class="pc-dataset" id="r-dataset-label">Brain MRI Dataset</div>
+
+            <div class="confidence-row">
+              <span class="conf-label">Confidence</span>
+              <span class="conf-value" id="r-conf-val">91.4%</span>
+            </div>
+            <div class="conf-bar-track">
+              <div class="conf-bar-fill" id="conf-bar"></div>
+            </div>
+          </div>
+
+          <!-- PROBABILITY BREAKDOWN -->
+          <div>
+            <div class="section-label">Class Probabilities</div>
+            <div class="prob-list" id="prob-list"></div>
+          </div>
+
+          <!-- INFERENCE INFO -->
+          <div>
+            <div class="section-label">Inference Details</div>
+            <div class="info-grid">
+              <div class="info-cell">
+                <div class="info-cell-label">Inference Time</div>
+                <div class="info-cell-value" id="r-time">124ms</div>
+              </div>
+              <div class="info-cell">
+                <div class="info-cell-label">Image Size</div>
+                <div class="info-cell-value">224 × 224</div>
+              </div>
+              <div class="info-cell">
+                <div class="info-cell-label">Architecture</div>
+                <div class="info-cell-value" id="r-arch">ResNet50</div>
+              </div>
+              <div class="info-cell">
+                <div class="info-cell-label">Classes</div>
+                <div class="info-cell-value" id="r-classes">4</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="medical-warning">
+            <svg viewBox="0 0 24 24">
+              <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <p>This result is AI-generated and intended for research purposes only. Not a clinical diagnosis.</p>
+          </div>
+
+        </div>
+
+        <!-- RIGHT: images + heatmap -->
+        <div class="result-right">
+
+          <div>
+            <div class="section-label">Visual Explainability — Grad-CAM</div>
+            <div class="img-compare-wrap">
+              <div class="img-block">
+                <div class="img-block-label">Original</div>
+                <img id="r-original-img" src="" alt="Original" style="background:#e8e3d9;" />
+              </div>
+              <div class="img-block">
+                <div class="img-block-label">Heatmap Overlay</div>
+                <div class="heatmap-placeholder" id="heatmap-placeholder">
+                  <canvas id="heatmap-canvas"></canvas>
+                  <span class="heatmap-overlay-label">Grad-CAM Active</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="section-label">Legend</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);">
+                <div style="width:12px;height:12px;border-radius:2px;background:#1a0000;"></div>Low activation
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);">
+                <div style="width:12px;height:12px;border-radius:2px;background:#8b0000;"></div>Medium
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);">
+                <div style="width:12px;height:12px;border-radius:2px;background:#ff4500;"></div>High
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);">
+                <div style="width:12px;height:12px;border-radius:2px;background:#ffd700;"></div>Peak activation
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn-new" onclick="goBack()">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              New Analysis
+            </button>
+            <button class="btn-new" onclick="downloadResult()">
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export Report
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
