@@ -2,36 +2,90 @@ import os
 import shutil
 import random
 
-dataset = "breast_dataset"
+def split_dataset(raw_path, output_path, train_ratio=0.7, val_ratio=0.15):
+    for split in ["train", "val", "test"]:
+        os.makedirs(os.path.join(output_path, split), exist_ok=True)
 
-train_path = "breast_dataset/train"
-val_path = "breast_dataset/val"
-test_path = "breast_dataset/test"
+    classes = os.listdir(raw_path)
 
-classes = ["benign", "malignant"]
+    for c in classes:
+        class_path = os.path.join(raw_path, c)
+        if not os.path.isdir(class_path):
+            continue
 
-for c in classes:
-    os.makedirs(os.path.join(train_path, c), exist_ok=True)
-    os.makedirs(os.path.join(val_path, c), exist_ok=True)
-    os.makedirs(os.path.join(test_path, c), exist_ok=True)
+        files = os.listdir(class_path)
+        random.shuffle(files)
 
-    files = os.listdir(os.path.join(dataset, c))
-    random.shuffle(files)
+        train_split = int(train_ratio * len(files))
+        val_split = int((train_ratio + val_ratio) * len(files))
 
-    train_split = int(0.7 * len(files))
-    val_split = int(0.85 * len(files))
+        splits = {
+            "train": files[:train_split],
+            "val": files[train_split:val_split],
+            "test": files[val_split:]
+        }
 
-    train_files = files[:train_split]
-    val_files = files[train_split:val_split]
-    test_files = files[val_split:]
+        for split in splits:
+            split_class_path = os.path.join(output_path, split, c)
+            os.makedirs(split_class_path, exist_ok=True)
 
-    for f in train_files:
-        shutil.copy(os.path.join(dataset, c, f), os.path.join(train_path, c, f))
+            for f in splits[split]:
+                src = os.path.join(class_path, f)
+                dst = os.path.join(split_class_path, f)
+                shutil.copy(src, dst)
 
-    for f in val_files:
-        shutil.copy(os.path.join(dataset, c, f), os.path.join(val_path, c, f))
+        print(f"{c}: {len(files)} images split")
 
-    for f in test_files:
-        shutil.copy(os.path.join(dataset, c, f), os.path.join(test_path, c, f))
+    print("Full dataset split completed!")
 
-print("Dataset split completed!")
+def create_val_split(dataset_path, val_ratio=0.2):
+    train_path = os.path.join(dataset_path, "train")
+    val_path = os.path.join(dataset_path, "val")
+
+    if not os.path.exists(train_path):
+        print("Train folder not found!")
+        return
+
+    if os.path.exists(val_path) and len(os.listdir(val_path)) > 0:
+        print("Validation already exists. Skipping.")
+        return
+
+    os.makedirs(val_path, exist_ok=True)
+
+    classes = os.listdir(train_path)
+
+    for c in classes:
+        class_train_path = os.path.join(train_path, c)
+        class_val_path = os.path.join(val_path, c)
+
+        if not os.path.isdir(class_train_path):
+            continue
+
+        os.makedirs(class_val_path, exist_ok=True)
+
+        files = [
+            f for f in os.listdir(class_train_path)
+            if os.path.isfile(os.path.join(class_train_path, f))
+        ]
+
+        random.shuffle(files)
+
+        val_count = int(val_ratio * len(files))
+        val_files = files[:val_count]
+
+        for f in val_files:
+            src = os.path.join(class_train_path, f)
+            dst = os.path.join(class_val_path, f)
+            shutil.move(src, dst)
+
+        print(f"{c}: moved {len(val_files)} images to val")
+
+    print("Validation split created!")
+
+# Breast dataset (raw → split)
+if os.path.exists("datasets/breast/raw"):
+    split_dataset("datasets/breast/raw", "datasets/breast")
+
+# Brain dataset (train → val)
+if os.path.exists("datasets/brain"):
+    create_val_split("datasets/brain")
