@@ -9,6 +9,7 @@ __pycache__/
 # dataset 
 datasets/*
 !datasets/.gitkeep
+training/
 
 # Distribution / packaging
 .Python
@@ -29,6 +30,15 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+
+# Model weights
+*.pth
+*.pt
+*.h5
+
+# OS files
+.DS_Store
+Thumbs.db
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

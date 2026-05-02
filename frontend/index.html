@@ -5,65 +5,80 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>OncoStream — Medical Imaging Intelligence</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- NAV -->
   <nav>
     <div class="nav-logo">
-      <div class="logo-mark"></div>
-      <span>OncoStream</span>
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="9" stroke="#e05a2b" stroke-width="1.5"/>
+          <circle cx="12" cy="12" r="3.5" fill="#e05a2b"/>
+          <line x1="12" y1="3" x2="12" y2="6" stroke="#e05a2b" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="12" y1="18" x2="12" y2="21" stroke="#e05a2b" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="3" y1="12" x2="6" y2="12" stroke="#e05a2b" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="18" y1="12" x2="21" y2="12" stroke="#e05a2b" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="nav-brand">OncoStream</span>
+      <span class="nav-divider"></span>
+      <span class="nav-sub">Medical Imaging Intelligence</span>
+    </div>
+    <div class="nav-right">
+      <div class="nav-status">
+        <span class="status-dot"></span>
+        <span>Systems Operational</span>
+      </div>
     </div>
   </nav>
 
   <main>
-    <!-- UPLOAD PAGE {PAGE 1} --> 
+
+    <!-- PAGE 1: UPLOAD -->
     <div id="page-upload">
 
       <div class="hero-header">
-        <div>
-          <div class="hero-eyebrow">Medical Imaging Intelligence</div>
+        <div class="hero-left">
+          <div class="hero-eyebrow">
+            <span class="eyebrow-line"></span>
+            AI-Assisted Classification
+          </div>
           <h1 class="hero-title">Upload. Analyze.<br><em>Understand.</em></h1>
-          <p class="hero-desc">Upload a medical image for AI-assisted classification using ResNet50 and Swin Transformer architectures with Grad-CAM visualization.</p>
-        </div>
-        <div class="hero-stats">
-          <div class="stat-pill">
-            <div class="stat-val">ResNet50</div>
-            <div class="stat-lbl">CNN Architecture</div>
-          </div>
-          <div class="stat-pill">
-            <div class="stat-val">Swin-T</div>
-            <div class="stat-lbl">Transformer Model</div>
-          </div>
-          <div class="stat-pill">
-            <div class="stat-val">Grad-CAM</div>
-            <div class="stat-lbl">Visual Explainability</div>
+          <p class="hero-desc">Submit a medical image for multi-model AI classification using ResNet50 and Swin Transformer architectures, with Grad-CAM explainability overlays generated automatically.</p>
+          <div class="hero-badges">
+            <span class="h-badge">ResNet50</span>
+            <span class="h-badge-sep">+</span>
+            <span class="h-badge">Swin Transformer</span>
+            <span class="h-badge-sep">+</span>
+            <span class="h-badge">Grad-CAM</span>
           </div>
         </div>
       </div>
 
-      <div class="upload-section">
+      <div class="upload-layout">
 
-        <!-- DROPZONE AREA -->
         <div class="upload-main">
-          <div class="section-label">Step 01 : Upload Image</div>
+          <div class="section-label">
+            <span class="sl-num">01</span>
+            Upload Image
+          </div>
 
           <div class="dropzone" id="dropzone">
             <input type="file" id="file-input" accept="image/png, image/jpeg, image/jpg" />
 
-            <div class="upload-prompt" style="display:flex;flex-direction:column;align-items:center;gap:20px;">
+            <div class="upload-prompt" id="upload-prompt">
               <div class="dz-icon">
-                <svg viewBox="0 0 24 24">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
                   <polyline points="17 8 12 3 7 8"/>
                   <line x1="12" y1="3" x2="12" y2="15"/>
                 </svg>
               </div>
               <div class="dz-text">
-                <strong>Drop your image here</strong>
-                <span>or click anywhere to browse</span>
+                <strong>Drop your medical image here</strong>
+                <span>or click to browse files</span>
               </div>
               <div class="dz-formats">
                 <span class="fmt-tag">PNG</span>
@@ -74,74 +89,78 @@
 
             <div class="preview-wrapper" id="preview-wrapper">
               <img class="preview-img" id="preview-img" src="" alt="Preview" />
-              <div class="preview-name" id="preview-name">filename.jpg</div>
-              <span class="preview-change" id="preview-change">Change image</span>
+              <div class="preview-meta">
+                <span class="preview-name" id="preview-name">filename.jpg</span>
+                <button class="preview-change" id="preview-change">Replace</button>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- SIDEBAR -->
         <div class="upload-sidebar">
 
-          <div class="section-label">Step 02 : Configure</div>
+          <div class="section-label">
+            <span class="sl-num">02</span>
+            Configure Study
+          </div>
 
-          <!-- DATASET SELECT -->
           <div class="field-group">
             <div class="field-label">Dataset Type</div>
             <div class="dataset-options" id="dataset-options">
 
               <label class="dataset-option selected" data-val="brain">
                 <input type="radio" name="dataset" value="brain" checked>
-                <div class="dataset-dot"></div>
-                <div class="dataset-info">
+                <div class="ds-radio"></div>
+                <div class="ds-info">
                   <strong>Brain MRI</strong>
                   <span>Glioma · Meningioma · Pituitary · No Tumor</span>
                 </div>
-                <span class="dataset-badge badge-brain">4 CLASSES</span>
+                <span class="ds-badge badge-neuro">4 CLASS</span>
               </label>
 
               <label class="dataset-option" data-val="breast">
                 <input type="radio" name="dataset" value="breast">
-                <div class="dataset-dot"></div>
-                <div class="dataset-info">
+                <div class="ds-radio"></div>
+                <div class="ds-info">
                   <strong>Breast Histopathology</strong>
                   <span>Benign · Malignant</span>
                 </div>
-                <span class="dataset-badge badge-breast">2 CLASSES</span>
+                <span class="ds-badge badge-histo">2 CLASS</span>
               </label>
 
             </div>
           </div>
 
-          <!-- MODEL SELECT -->
-          <div class="field-group">
-            <div class="field-label">Model Architecture</div>
-            <div class="model-select-wrap">
-              <select id="model-select">
-                <option value="resnet">ResNet50 (CNN)</option>
-                <option value="swin">Swin Transformer</option>
-                <option value="ensemble">Ensemble (Both)</option>
-              </select>
+          <div class="model-info-card">
+            <div class="mic-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+              Multi-Model Ensemble
+            </div>
+            <p class="mic-desc">All three models run automatically — ResNet50, Swin Transformer, and their Ensemble prediction — so you can compare results side by side.</p>
+            <div class="mic-models">
+              <div class="mic-model-chip">ResNet50</div>
+              <div class="mic-model-chip">Swin-T</div>
+              <div class="mic-model-chip active">Ensemble</div>
             </div>
           </div>
 
-          <!-- NOTICE -->
           <div class="notice-card">
-            <svg viewBox="0 0 24 24">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round">
               <circle cx="12" cy="12" r="10"/>
               <line x1="12" y1="8" x2="12" y2="12"/>
               <line x1="12" y1="16" x2="12.01" y2="16"/>
             </svg>
-            <p>Results include a Grad-CAM heatmap highlighting regions influencing the prediction.</p>
+            <p>Grad-CAM heatmaps are generated automatically for each model, highlighting the regions most influential to the prediction.</p>
           </div>
 
-          <!-- SUBMIT -->
           <button class="btn-analyze" id="btn-analyze" onclick="runAnalysis()">
-            <svg viewBox="0 0 24 24">
-              <circle cx="11" cy="11" r="8"/>
-              <path d="M21 21l-4.35-4.35"/>
-            </svg>
-            Run Analysis
+            <span class="btn-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="M21 21l-4.35-4.35"/>
+              </svg>
+            </span>
+            <span class="btn-label">Run Full Analysis</span>
           </button>
 
         </div>
@@ -149,131 +168,202 @@
     </div>
 
 
-    <!-- RESULT PAGE {PAGE 2} -->
+    <!-- PAGE 2: RESULTS -->
     <div id="page-result">
 
       <div class="result-header">
         <div class="result-header-left">
           <button class="back-btn" onclick="goBack()">
-            <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-            New analysis
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            New Analysis
           </button>
-          <h2 class="result-title">Analysis Complete</h2>
-          <div class="result-meta">
-            Model: <span id="r-model">ResNet50</span>&nbsp;&nbsp;
-            Dataset: <span id="r-dataset">Brain MRI</span>
+          <div class="result-title-row">
+            <h2 class="result-title">Analysis Complete</h2>
+            <div class="result-badge-row">
+              <span class="r-badge" id="r-dataset-badge">Brain MRI</span>
+              <span class="r-badge r-badge-time" id="r-timestamp"></span>
+            </div>
           </div>
         </div>
-        <div class="result-timestamp" id="r-timestamp"></div>
+        <div class="result-actions">
+          <button class="btn-export" onclick="downloadResult()">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export Report
+          </button>
+        </div>
       </div>
 
       <div class="result-body">
 
-        <!-- LEFT: prediction + breakdown -->
+        <!-- LEFT: Summary + all model results -->
         <div class="result-left">
 
-          <!-- PREDICTION CARD -->
-          <div class="prediction-card">
-            <div class="pc-label">Primary Diagnosis</div>
-            <div class="pc-diagnosis" id="r-diagnosis">Glioma</div>
-            <div class="pc-dataset" id="r-dataset-label">Brain MRI Dataset</div>
-
-            <div class="confidence-row">
-              <span class="conf-label">Confidence</span>
-              <span class="conf-value" id="r-conf-val">91.4%</span>
+          <!-- CONSENSUS BANNER -->
+          <div class="consensus-card">
+            <div class="cc-label">Ensemble Consensus · Primary Diagnosis</div>
+            <div class="cc-diagnosis" id="r-diagnosis">Glioma</div>
+            <div class="cc-sub" id="r-dataset-label">Brain MRI Dataset</div>
+            <div class="cc-conf-row">
+              <span class="cc-conf-label">Ensemble Confidence</span>
+              <span class="cc-conf-val" id="r-conf-val">91.4%</span>
             </div>
             <div class="conf-bar-track">
               <div class="conf-bar-fill" id="conf-bar"></div>
             </div>
           </div>
 
-          <!-- PROBABILITY BREAKDOWN -->
+          <!-- MODEL COMPARISON TABS -->
           <div>
-            <div class="section-label">Class Probabilities</div>
-            <div class="prob-list" id="prob-list"></div>
+            <div class="section-label">
+              <span class="sl-num">A</span>
+              Model-by-Model Results
+            </div>
+            <div class="model-tabs">
+              <button class="model-tab active" data-model="ensemble" onclick="switchModel('ensemble',this)">Ensemble</button>
+              <button class="model-tab" data-model="resnet" onclick="switchModel('resnet',this)">ResNet50</button>
+              <button class="model-tab" data-model="swin" onclick="switchModel('swin',this)">Swin-T</button>
+            </div>
+
+            <div class="model-panel active" id="panel-ensemble">
+              <div class="panel-meta">
+                <span class="pm-arch">Ensemble (ResNet50 + Swin-T)</span>
+                <span class="pm-time" id="time-ensemble">—</span>
+              </div>
+              <div class="prob-list" id="probs-ensemble"></div>
+            </div>
+            <div class="model-panel" id="panel-resnet">
+              <div class="panel-meta">
+                <span class="pm-arch">ResNet50 — CNN Architecture</span>
+                <span class="pm-time" id="time-resnet">—</span>
+              </div>
+              <div class="prob-list" id="probs-resnet"></div>
+            </div>
+            <div class="model-panel" id="panel-swin">
+              <div class="panel-meta">
+                <span class="pm-arch">Swin Transformer — Vision Transformer</span>
+                <span class="pm-time" id="time-swin">—</span>
+              </div>
+              <div class="prob-list" id="probs-swin"></div>
+            </div>
           </div>
 
-          <!-- INFERENCE INFO -->
+          <!-- INFERENCE DETAILS -->
           <div>
-            <div class="section-label">Inference Details</div>
+            <div class="section-label">
+              <span class="sl-num">B</span>
+              Inference Details
+            </div>
             <div class="info-grid">
               <div class="info-cell">
-                <div class="info-cell-label">Inference Time</div>
-                <div class="info-cell-value" id="r-time">124ms</div>
+                <div class="info-cell-label">Input Resolution</div>
+                <div class="info-cell-value">224 × 224 px</div>
               </div>
               <div class="info-cell">
-                <div class="info-cell-label">Image Size</div>
-                <div class="info-cell-value">224 × 224</div>
+                <div class="info-cell-label">Total Inference</div>
+                <div class="info-cell-value" id="r-total-time">—</div>
               </div>
               <div class="info-cell">
-                <div class="info-cell-label">Architecture</div>
-                <div class="info-cell-value" id="r-arch">ResNet50</div>
+                <div class="info-cell-label">Models Run</div>
+                <div class="info-cell-value">3 (Parallel)</div>
               </div>
               <div class="info-cell">
-                <div class="info-cell-label">Classes</div>
+                <div class="info-cell-label">Classes Evaluated</div>
                 <div class="info-cell-value" id="r-classes">4</div>
               </div>
             </div>
           </div>
 
           <div class="medical-warning">
-            <svg viewBox="0 0 24 24">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round">
               <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
               <line x1="12" y1="9" x2="12" y2="13"/>
               <line x1="12" y1="17" x2="12.01" y2="17"/>
             </svg>
-            <p>This result is AI-generated and intended for research purposes only. Not a clinical diagnosis.</p>
+            <div>
+              <strong>Research Use Only</strong>
+              <p>This AI-generated result is not a clinical diagnosis. Always consult a qualified medical professional for diagnostic decisions.</p>
+            </div>
           </div>
 
         </div>
 
-        <!-- RIGHT: images + heatmap -->
+        <!-- RIGHT: Grad-CAM images per model -->
         <div class="result-right">
 
           <div>
-            <div class="section-label">Visual Explainability — Grad-CAM</div>
-            <div class="img-compare-wrap">
-              <div class="img-block">
-                <div class="img-block-label">Original</div>
-                <img id="r-original-img" src="" alt="Original" style="background:#e8e3d9;" />
+            <div class="section-label">
+              <span class="sl-num">C</span>
+              Grad-CAM Visualizations
+            </div>
+
+            <div class="heatmap-model-tabs">
+              <button class="hm-tab active" data-hm="ensemble" onclick="switchHeatmap('ensemble',this)">Ensemble</button>
+              <button class="hm-tab" data-hm="resnet" onclick="switchHeatmap('resnet',this)">ResNet50</button>
+              <button class="hm-tab" data-hm="swin" onclick="switchHeatmap('swin',this)">Swin-T</button>
+            </div>
+
+            <div class="hm-panel active" id="hm-ensemble">
+              <div class="img-compare-wrap">
+                <div class="img-block">
+                  <div class="img-block-label">Original</div>
+                  <img id="r-original-img" src="" alt="Original"/>
+                </div>
+                <div class="img-block">
+                  <div class="img-block-label">Grad-CAM — Ensemble</div>
+                  <div class="heatmap-container">
+                    <canvas id="heatmap-ensemble"></canvas>
+                    <span class="heatmap-chip">Active</span>
+                  </div>
+                </div>
               </div>
-              <div class="img-block">
-                <div class="img-block-label">Heatmap Overlay</div>
-                <div class="heatmap-placeholder" id="heatmap-placeholder">
-                  <canvas id="heatmap-canvas"></canvas>
-                  <span class="heatmap-overlay-label">Grad-CAM Active</span>
+            </div>
+            <div class="hm-panel" id="hm-resnet">
+              <div class="img-compare-wrap">
+                <div class="img-block">
+                  <div class="img-block-label">Original</div>
+                  <img class="r-orig-clone" src="" alt="Original"/>
+                </div>
+                <div class="img-block">
+                  <div class="img-block-label">Grad-CAM — ResNet50</div>
+                  <div class="heatmap-container">
+                    <canvas id="heatmap-resnet"></canvas>
+                    <span class="heatmap-chip">Active</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="hm-panel" id="hm-swin">
+              <div class="img-compare-wrap">
+                <div class="img-block">
+                  <div class="img-block-label">Original</div>
+                  <img class="r-orig-clone" src="" alt="Original"/>
+                </div>
+                <div class="img-block">
+                  <div class="img-block-label">Grad-CAM — Swin-T</div>
+                  <div class="heatmap-container">
+                    <canvas id="heatmap-swin"></canvas>
+                    <span class="heatmap-chip">Active</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div>
-            <div class="section-label">Legend</div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;">
-              <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);">
-                <div style="width:12px;height:12px;border-radius:2px;background:#1a0000;"></div>Low activation
-              </div>
-              <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);">
-                <div style="width:12px;height:12px;border-radius:2px;background:#8b0000;"></div>Medium
-              </div>
-              <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);">
-                <div style="width:12px;height:12px;border-radius:2px;background:#ff4500;"></div>High
-              </div>
-              <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);">
-                <div style="width:12px;height:12px;border-radius:2px;background:#ffd700;"></div>Peak activation
-              </div>
-            </div>
+          <!-- LEGEND -->
+          <div class="legend-row">
+            <div class="legend-item"><span class="legend-swatch" style="background:#1a0000;"></span>Low activation</div>
+            <div class="legend-item"><span class="legend-swatch" style="background:#8b0000;"></span>Medium</div>
+            <div class="legend-item"><span class="legend-swatch" style="background:#ff4500;"></span>High</div>
+            <div class="legend-item"><span class="legend-swatch" style="background:#ffd700;"></span>Peak</div>
           </div>
 
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <button class="btn-new" onclick="goBack()">
-              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              New Analysis
-            </button>
-            <button class="btn-new" onclick="downloadResult()">
-              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Export Report
-            </button>
+          <!-- MODEL AGREEMENT -->
+          <div>
+            <div class="section-label">
+              <span class="sl-num">D</span>
+              Model Agreement
+            </div>
+            <div class="agreement-grid" id="agreement-grid"></div>
           </div>
 
         </div>
