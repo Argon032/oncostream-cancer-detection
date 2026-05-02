@@ -9,7 +9,6 @@ __pycache__/
 # dataset 
 datasets/*
 !datasets/.gitkeep
-training/
 
 # Distribution / packaging
 .Python
