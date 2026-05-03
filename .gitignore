@@ -30,6 +30,10 @@ share/python-wheels/
 *.egg
 MANIFEST
 
+# temp files
+*.tmp
+*.temp
+
 # Model weights
 *.pth
 *.pt
