@@ -113,59 +113,10 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {DEVICE}")
 
 
-#  Data transforms
-IMAGENET_MEAN = [0.485, 0.456, 0.406]
-IMAGENET_STD  = [0.229, 0.224, 0.225]
+# Model loading
+sys.path.insert(0, os.path.join(PROJECT_ROOT, "preprocessing"))
+from preprocessing.dataloader import get_dataloaders
 
-train_transforms = transforms.Compose([
-    transforms.Resize((224, 224)),
-    transforms.RandomHorizontalFlip(p=0.5),
-    transforms.RandomRotation(degrees=15),
-    transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.1),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
-])
-
-val_test_transforms = transforms.Compose([
-    transforms.Resize((224, 224)),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
-])
-
-
-#  Data loading
-def get_dataloaders(dataset_path: str, batch_size: int, num_workers: int):
-    train_dataset = datasets.ImageFolder(
-        root=os.path.join(dataset_path, "train"),
-        transform=train_transforms
-    )
-    val_dataset = datasets.ImageFolder(
-        root=os.path.join(dataset_path, "val"),
-        transform=val_test_transforms
-    )
-    test_dataset = datasets.ImageFolder(
-        root=os.path.join(dataset_path, "test"),
-        transform=val_test_transforms
-    )
-
-    train_loader = DataLoader(train_dataset, batch_size=batch_size,
-                              shuffle=True,  num_workers=num_workers,
-                              pin_memory=True)
-    val_loader   = DataLoader(val_dataset,   batch_size=batch_size,
-                              shuffle=False, num_workers=num_workers,
-                              pin_memory=True)
-    test_loader  = DataLoader(test_dataset,  batch_size=batch_size,
-                              shuffle=False, num_workers=num_workers,
-                              pin_memory=True)
-
-    print(f"Train: {len(train_dataset)} images | "
-          f"Val: {len(val_dataset)} images | "
-          f"Test: {len(test_dataset)} images")
-    print(f"Classes: {train_dataset.classes}")
-    return train_loader, val_loader, test_loader
-
-
-#  Model loading
 def load_model(model_name: str, num_classes: int, cfg: dict):
     sys.path.insert(0, os.path.join(PROJECT_ROOT, "models", "transformer"))
 
