@@ -62,41 +62,28 @@ from torchvision import datasets, transforms
 
 #  CONFIG — edit this block before running
 CONFIG = {
-    # Model: 'swin' or 'vit'
-    "model_name": "swin",
+    "model_name": "vit",        # start with vit
+    "dataset": "breast",        # your dataset
 
-    # Dataset: 'brain' or 'breast'
-    "dataset": "brain",
-
-    # Root folder of the project (contains datasets/, results/, models/)
-    # On Colab:  "/content/drive/MyDrive/oncostream-cancer-detection"
     "project_root": ".",
 
-    # Training hyperparameters
-    "epochs": 30,
-    "batch_size": 16,
+    "epochs": 1,                # keep small first
+    "batch_size": 8,            # reduce load
 
-    # Swin uses two LRs (backbone vs head); ViT uses a single LR.
-    # These are the values for Swin. For ViT, only head_lr is used.
-    "head_lr":     1e-4,        # LR for the new classification head
-    "backbone_lr": 1e-5,        # LR for unfrozen backbone layers (Swin only)
+    "head_lr": 1e-4,
+    "backbone_lr": 1e-5,
 
-    "weight_decay": 0.05,       # AdamW weight decay (higher than CNN)
+    "weight_decay": 0.05,
+    "warmup_epochs": 1,
+    "patience": 3,
 
-    # Warmup: number of epochs to linearly ramp LR from 0 to target
-    "warmup_epochs": 3,
-
-    # Early stopping patience
-    "patience": 7,
-
-    # Number of CPU workers for data loading
-    "num_workers": 2,
+    "num_workers": 0            # IMPORTANT for Windows
 }
 
 
 # Resolve paths 
 PROJECT_ROOT = os.path.abspath(CONFIG["project_root"])
-DATASET_PATH = os.path.join(PROJECT_ROOT, "datasets", CONFIG["dataset"])
+DATASET_PATH = os.path.join(PROJECT_ROOT, "breast_dataset")
 RESULTS_PATH = os.path.join(PROJECT_ROOT, "results", CONFIG["dataset"])
 os.makedirs(RESULTS_PATH, exist_ok=True)
 
@@ -114,7 +101,7 @@ print(f"Using device: {DEVICE}")
 
 
 # Model loading
-sys.path.insert(0, os.path.join(PROJECT_ROOT, "preprocessing"))
+sys.path.insert(0, PROJECT_ROOT)
 from preprocessing.dataloader import get_dataloaders
 
 def load_model(model_name: str, num_classes: int, cfg: dict):
