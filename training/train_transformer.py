@@ -115,13 +115,13 @@ print(f"Using device: {DEVICE}")
 
 # Model loading
 sys.path.insert(0, os.path.join(PROJECT_ROOT, "preprocessing"))
-from preprocessing.dataloader import get_dataloaders
+from dataloader import get_dataloaders
 
 def load_model(model_name: str, num_classes: int, cfg: dict):
     sys.path.insert(0, os.path.join(PROJECT_ROOT, "models", "transformer"))
 
     if model_name == "swin":
-        from models.transformer.swin import get_model, get_param_groups
+        from swin import get_model, get_param_groups
         model = get_model(num_classes=num_classes).to(DEVICE)
         # Differential LRs: backbone gets 10x lower LR than head
         param_groups = get_param_groups(
@@ -135,7 +135,7 @@ def load_model(model_name: str, num_classes: int, cfg: dict):
         )
 
     elif model_name == "vit":
-        from models.transformer.vit import get_model
+        from vit import get_model
         model = get_model(num_classes=num_classes).to(DEVICE)
         # ViT: single LR for all trainable params
         optimizer = torch.optim.AdamW(

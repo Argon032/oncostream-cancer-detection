@@ -7,8 +7,12 @@ __pycache__/
 *.so
 
 # dataset 
-datasets/*
-!datasets/.gitkeep
+datasets/brain/*
+datasets/breast/*
+
+!datasets/brain/.gitkeep
+!datasets/breast/.gitkeep
+!datasets/README.md
 
 # Distribution / packaging
 .Python

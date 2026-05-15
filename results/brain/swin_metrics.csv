@@ -1,0 +1,6 @@
+class,precision,recall,f1,support
+glioma,0.996,0.6175,0.7623,400
+meningioma,0.8025,0.945,0.868,400
+pituitary,0.4981,1.0,0.665,400
+no_tumor,0.9744,0.19,0.318,400
+macro avg,0.8178,0.6881,0.6533,1600

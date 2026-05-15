@@ -2,7 +2,7 @@ import os
 import shutil
 import random
 
-source = "datasets/breast/BreaKHis_v1/histology_slides/breast"
+source = "datasets/breast/BreaKHis_v1/BreaKHis_v1/histology_slides/breast"
 output = "datasets/breast/raw"
 
 benign_out = os.path.join(output, "benign")

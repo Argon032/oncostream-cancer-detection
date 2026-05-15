@@ -38,7 +38,7 @@ def split_dataset(raw_path, output_path, train_ratio=0.7, val_ratio=0.15):
 
     print("Full dataset split completed!")
 
-def create_val_split(dataset_path, val_ratio=0.2):
+def create_val_split(dataset_path, val_ratio=0.15):
     train_path = os.path.join(dataset_path, "train")
     val_path = os.path.join(dataset_path, "val")
 

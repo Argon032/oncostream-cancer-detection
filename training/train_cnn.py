@@ -106,16 +106,16 @@ print(f"Using device: {DEVICE}")
 #  Model loading
 
 sys.path.insert(0, os.path.join(PROJECT_ROOT, "preprocessing"))
-from preprocessing.dataloader import get_dataloaders
+from dataloader import get_dataloaders
 
 def load_model(model_name: str, num_classes: int) -> nn.Module:
     # Dynamically import from the models/ directory
     sys.path.insert(0, os.path.join(PROJECT_ROOT, "models", "cnn"))
 
     if model_name == "resnet50":
-        from models.cnn.resnet50 import get_model
+        from resnet50 import get_model
     elif model_name == "mobilenet":
-        from models.cnn.mobilenet import get_model
+        from mobilenet import get_model
     else:
         raise ValueError(f"Unknown CNN model: '{model_name}'. "
                          f"Choose 'resnet50' or 'mobilenet'.")
