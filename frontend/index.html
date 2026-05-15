@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>OncoStream — Medical Imaging Intelligence</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -14,12 +14,12 @@
     <div class="nav-logo">
       <div class="logo-mark">
         <svg viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="9" stroke="#e05a2b" stroke-width="1.5"/>
-          <circle cx="12" cy="12" r="3.5" fill="#e05a2b"/>
-          <line x1="12" y1="3" x2="12" y2="6" stroke="#e05a2b" stroke-width="1.5" stroke-linecap="round"/>
-          <line x1="12" y1="18" x2="12" y2="21" stroke="#e05a2b" stroke-width="1.5" stroke-linecap="round"/>
-          <line x1="3" y1="12" x2="6" y2="12" stroke="#e05a2b" stroke-width="1.5" stroke-linecap="round"/>
-          <line x1="18" y1="12" x2="21" y2="12" stroke="#e05a2b" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="12" cy="12" r="9" stroke="#c8412a" stroke-width="1.5"/>
+          <circle cx="12" cy="12" r="3.5" fill="#c8412a"/>
+          <line x1="12" y1="3" x2="12" y2="6" stroke="#c8412a" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="12" y1="18" x2="12" y2="21" stroke="#c8412a" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="3" y1="12" x2="6" y2="12" stroke="#c8412a" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="18" y1="12" x2="21" y2="12" stroke="#c8412a" stroke-width="1.5" stroke-linecap="round"/>
         </svg>
       </div>
       <span class="nav-brand">OncoStream</span>
@@ -27,6 +27,8 @@
       <span class="nav-sub">Medical Imaging Intelligence</span>
     </div>
     <div class="nav-right">
+      <button class="nav-link" onclick="showPage('page-upload')">Analysis</button>
+      <button class="nav-link" onclick="showPage('page-about')">About</button>
       <div class="nav-status">
         <span class="status-dot"></span>
         <span>Systems Operational</span>
@@ -36,23 +38,21 @@
 
   <main>
 
-    <!-- PAGE 1: UPLOAD -->
     <div id="page-upload">
-
       <div class="hero-header">
         <div class="hero-left">
           <div class="hero-eyebrow">
             <span class="eyebrow-line"></span>
-            AI-Assisted Classification
+            AI-Assisted Classification using Deep Learning Architectures
           </div>
           <h1 class="hero-title">Upload. Analyze.<br><em>Understand.</em></h1>
-          <p class="hero-desc">Submit a medical image for multi-model AI classification using ResNet50 and Swin Transformer architectures, with Grad-CAM explainability overlays generated automatically.</p>
+          <p class="hero-desc">Submit a medical image for AI-driven classification using deep learning, delivering transparent, interpretable diagnostic support across oncological imaging datasets.</p>
           <div class="hero-badges">
-            <span class="h-badge">ResNet50</span>
+            <span class="h-badge">Deep Learning</span>
             <span class="h-badge-sep">+</span>
-            <span class="h-badge">Swin Transformer</span>
+            <span class="h-badge">Saliency Mapping</span>
             <span class="h-badge-sep">+</span>
-            <span class="h-badge">Grad-CAM</span>
+            <span class="h-badge">Oncology Imaging</span>
           </div>
         </div>
       </div>
@@ -131,26 +131,13 @@
             </div>
           </div>
 
-          <div class="model-info-card">
-            <div class="mic-header">
-              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-              Multi-Model Ensemble
-            </div>
-            <p class="mic-desc">All three models run automatically — ResNet50, Swin Transformer, and their Ensemble prediction — so you can compare results side by side.</p>
-            <div class="mic-models">
-              <div class="mic-model-chip">ResNet50</div>
-              <div class="mic-model-chip">Swin-T</div>
-              <div class="mic-model-chip active">Ensemble</div>
-            </div>
-          </div>
-
           <div class="notice-card">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round">
               <circle cx="12" cy="12" r="10"/>
               <line x1="12" y1="8" x2="12" y2="12"/>
               <line x1="12" y1="16" x2="12.01" y2="16"/>
             </svg>
-            <p>Grad-CAM heatmaps are generated automatically for each model, highlighting the regions most influential to the prediction.</p>
+            <p>An activation map is generated alongside each classification, visually highlighting the image regions that most influenced the model's prediction.</p>
           </div>
 
           <button class="btn-analyze" id="btn-analyze" onclick="runAnalysis()">
@@ -160,7 +147,7 @@
                 <path d="M21 21l-4.35-4.35"/>
               </svg>
             </span>
-            <span class="btn-label">Run Full Analysis</span>
+            <span class="btn-label">Run Analysis</span>
           </button>
 
         </div>
@@ -168,7 +155,6 @@
     </div>
 
 
-    <!-- PAGE 2: RESULTS -->
     <div id="page-result">
 
       <div class="result-header">
@@ -195,16 +181,14 @@
 
       <div class="result-body">
 
-        <!-- LEFT: Summary + all model results -->
         <div class="result-left">
 
-          <!-- CONSENSUS BANNER -->
           <div class="consensus-card">
-            <div class="cc-label">Ensemble Consensus · Primary Diagnosis</div>
+            <div class="cc-label">Primary Diagnosis · AI Classification</div>
             <div class="cc-diagnosis" id="r-diagnosis">Glioma</div>
             <div class="cc-sub" id="r-dataset-label">Brain MRI Dataset</div>
             <div class="cc-conf-row">
-              <span class="cc-conf-label">Ensemble Confidence</span>
+              <span class="cc-conf-label">Model Confidence</span>
               <span class="cc-conf-val" id="r-conf-val">91.4%</span>
             </div>
             <div class="conf-bar-track">
@@ -212,42 +196,18 @@
             </div>
           </div>
 
-          <!-- MODEL COMPARISON TABS -->
           <div>
             <div class="section-label">
               <span class="sl-num">A</span>
-              Model-by-Model Results
+              Classification Results
             </div>
-            <div class="model-tabs">
-              <button class="model-tab active" data-model="ensemble" onclick="switchModel('ensemble',this)">Ensemble</button>
-              <button class="model-tab" data-model="resnet" onclick="switchModel('resnet',this)">ResNet50</button>
-              <button class="model-tab" data-model="swin" onclick="switchModel('swin',this)">Swin-T</button>
+            <div class="panel-meta">
+              <span class="pm-arch">Deep Learning Classifier</span>
+              <span class="pm-time" id="time-model">—</span>
             </div>
-
-            <div class="model-panel active" id="panel-ensemble">
-              <div class="panel-meta">
-                <span class="pm-arch">Ensemble (ResNet50 + Swin-T)</span>
-                <span class="pm-time" id="time-ensemble">—</span>
-              </div>
-              <div class="prob-list" id="probs-ensemble"></div>
-            </div>
-            <div class="model-panel" id="panel-resnet">
-              <div class="panel-meta">
-                <span class="pm-arch">ResNet50 — CNN Architecture</span>
-                <span class="pm-time" id="time-resnet">—</span>
-              </div>
-              <div class="prob-list" id="probs-resnet"></div>
-            </div>
-            <div class="model-panel" id="panel-swin">
-              <div class="panel-meta">
-                <span class="pm-arch">Swin Transformer — Vision Transformer</span>
-                <span class="pm-time" id="time-swin">—</span>
-              </div>
-              <div class="prob-list" id="probs-swin"></div>
-            </div>
+            <div class="prob-list" id="probs-model"></div>
           </div>
 
-          <!-- INFERENCE DETAILS -->
           <div>
             <div class="section-label">
               <span class="sl-num">B</span>
@@ -259,12 +219,12 @@
                 <div class="info-cell-value">224 × 224 px</div>
               </div>
               <div class="info-cell">
-                <div class="info-cell-label">Total Inference</div>
+                <div class="info-cell-label">Inference Time</div>
                 <div class="info-cell-value" id="r-total-time">—</div>
               </div>
               <div class="info-cell">
-                <div class="info-cell-label">Models Run</div>
-                <div class="info-cell-value">3 (Parallel)</div>
+                <div class="info-cell-label">Architecture</div>
+                <div class="info-cell-value">CNN-Based</div>
               </div>
               <div class="info-cell">
                 <div class="info-cell-label">Classes Evaluated</div>
@@ -281,75 +241,35 @@
             </svg>
             <div>
               <strong>Research Use Only</strong>
-              <p>This AI-generated result is not a clinical diagnosis. Always consult a qualified medical professional for diagnostic decisions.</p>
+              <p>This AI-generated result is not a clinical diagnosis. Always consult a qualified medical professional for all diagnostic decisions.</p>
             </div>
           </div>
 
         </div>
 
-        <!-- RIGHT: Grad-CAM images per model -->
         <div class="result-right">
 
           <div>
             <div class="section-label">
               <span class="sl-num">C</span>
-              Grad-CAM Visualizations
+              Activation Map Visualisation
             </div>
 
-            <div class="heatmap-model-tabs">
-              <button class="hm-tab active" data-hm="ensemble" onclick="switchHeatmap('ensemble',this)">Ensemble</button>
-              <button class="hm-tab" data-hm="resnet" onclick="switchHeatmap('resnet',this)">ResNet50</button>
-              <button class="hm-tab" data-hm="swin" onclick="switchHeatmap('swin',this)">Swin-T</button>
-            </div>
-
-            <div class="hm-panel active" id="hm-ensemble">
-              <div class="img-compare-wrap">
-                <div class="img-block">
-                  <div class="img-block-label">Original</div>
-                  <img id="r-original-img" src="" alt="Original"/>
-                </div>
-                <div class="img-block">
-                  <div class="img-block-label">Grad-CAM — Ensemble</div>
-                  <div class="heatmap-container">
-                    <canvas id="heatmap-ensemble"></canvas>
-                    <span class="heatmap-chip">Active</span>
-                  </div>
-                </div>
+            <div class="img-compare-wrap">
+              <div class="img-block">
+                <div class="img-block-label">Original</div>
+                <img id="r-original-img" src="" alt="Original"/>
               </div>
-            </div>
-            <div class="hm-panel" id="hm-resnet">
-              <div class="img-compare-wrap">
-                <div class="img-block">
-                  <div class="img-block-label">Original</div>
-                  <img class="r-orig-clone" src="" alt="Original"/>
-                </div>
-                <div class="img-block">
-                  <div class="img-block-label">Grad-CAM — ResNet50</div>
-                  <div class="heatmap-container">
-                    <canvas id="heatmap-resnet"></canvas>
-                    <span class="heatmap-chip">Active</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="hm-panel" id="hm-swin">
-              <div class="img-compare-wrap">
-                <div class="img-block">
-                  <div class="img-block-label">Original</div>
-                  <img class="r-orig-clone" src="" alt="Original"/>
-                </div>
-                <div class="img-block">
-                  <div class="img-block-label">Grad-CAM — Swin-T</div>
-                  <div class="heatmap-container">
-                    <canvas id="heatmap-swin"></canvas>
-                    <span class="heatmap-chip">Active</span>
-                  </div>
+              <div class="img-block">
+                <div class="img-block-label">Activation Overlay</div>
+                <div class="heatmap-container">
+                  <canvas id="heatmap-main"></canvas>
+                  <span class="heatmap-chip">Saliency Map</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- LEGEND -->
           <div class="legend-row">
             <div class="legend-item"><span class="legend-swatch" style="background:#1a0000;"></span>Low activation</div>
             <div class="legend-item"><span class="legend-swatch" style="background:#8b0000;"></span>Medium</div>
@@ -357,15 +277,195 @@
             <div class="legend-item"><span class="legend-swatch" style="background:#ffd700;"></span>Peak</div>
           </div>
 
-          <!-- MODEL AGREEMENT -->
-          <div>
-            <div class="section-label">
-              <span class="sl-num">D</span>
-              Model Agreement
+          <div class="interp-card">
+            <div class="interp-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              Interpretability Note
             </div>
-            <div class="agreement-grid" id="agreement-grid"></div>
+            <p>Warmer regions in the activation overlay indicate areas the model weighted most heavily when forming its prediction. These zones correspond to structurally significant features detected within the input image.</p>
           </div>
 
+        </div>
+
+      </div>
+    </div>
+
+
+    <div id="page-about">
+      <div class="about-hero">
+        <div class="about-hero-inner">
+          <div class="hero-eyebrow">
+            <span class="eyebrow-line"></span>
+            Research Team
+          </div>
+          <h1 class="about-title">The minds behind<br><em>OncoStream</em></h1>
+          <p class="about-subtitle">A multidisciplinary team of researchers and engineers working at the intersection of machine learning, medical imaging, and clinical informatics to build transparent, interpretable AI tools for oncology.</p>
+        </div>
+      </div>
+
+      <div class="about-body">
+
+        <div class="about-mission">
+          <div class="section-label">
+            <span class="sl-num">01</span>
+            Project Mission
+          </div>
+          <div class="mission-grid">
+            <div class="mission-card">
+              <div class="mc-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round">
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                </svg>
+              </div>
+              <h3>Clinical Transparency</h3>
+              <p>Every prediction is accompanied by a saliency-based activation map that highlights the spatial reasoning behind the model's output, enabling clinicians to interrogate and contextualise AI-assisted findings.</p>
+            </div>
+            <div class="mission-card">
+              <div class="mc-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M12 8v4l3 3"/>
+                </svg>
+              </div>
+              <h3>Rapid Analysis</h3>
+              <p>OncoStream processes medical images in milliseconds, providing near-instantaneous classification results that can support radiologists during high-volume screening workflows.</p>
+            </div>
+            <div class="mission-card">
+              <div class="mc-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+              </div>
+              <h3>Research Integrity</h3>
+              <p>Developed strictly for research and educational contexts. All outputs carry explicit disclaimers reinforcing that AI results must be reviewed and validated by qualified medical professionals.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="about-team">
+          <div class="section-label">
+            <span class="sl-num">02</span>
+            Contributors
+          </div>
+
+          <div class="team-grid">
+
+            <div class="team-card">
+              <div class="tc-avatar">SN</div>
+              <div class="tc-info">
+                <h3 class="tc-name">Syamantak Nandi</h3>
+                <span class="tc-role">Frontend &amp; API Development</span>
+                <div class="tc-tasks">
+                  <div class="task-item done"><span class="task-dot"></span>Dataset download and access</div>
+                  <div class="task-item done"><span class="task-dot"></span>UI pages — upload &amp; result</div>
+                  <div class="task-item progress"><span class="task-dot"></span>Heatmap display</div>
+                  <div class="task-item pending"><span class="task-dot"></span>/predict API endpoint</div>
+                  <div class="task-item pending"><span class="task-dot"></span>Model integration</div>
+                  <div class="task-item pending"><span class="task-dot"></span>compare_models.py</div>
+                </div>
+              </div>
+              <div class="tc-accent"></div>
+            </div>
+
+            <div class="team-card">
+              <div class="tc-avatar">AM</div>
+              <div class="tc-info">
+                <h3 class="tc-name">Arunima Mishra</h3>
+                <span class="tc-role">Preprocessing &amp; Model Training</span>
+                <div class="tc-tasks">
+                  <div class="task-item done"><span class="task-dot"></span>dataset_organize.py</div>
+                  <div class="task-item done"><span class="task-dot"></span>dataloader.py</div>
+                  <div class="task-item done"><span class="task-dot"></span>visualize_augmentation.py</div>
+                  <div class="task-item done"><span class="task-dot"></span>Swin Transformer implementation</div>
+                  <div class="task-item done"><span class="task-dot"></span>train_transformer.py pipeline</div>
+                  <div class="task-item progress"><span class="task-dot"></span>Model inference scripts</div>
+                  <div class="task-item progress"><span class="task-dot"></span>gradcam_generator.py</div>
+                </div>
+              </div>
+              <div class="tc-accent"></div>
+            </div>
+
+            <div class="team-card">
+              <div class="tc-avatar">SP</div>
+              <div class="tc-info">
+                <h3 class="tc-name">Shamikshya Parida</h3>
+                <span class="tc-role">Model Training &amp; Results</span>
+                <div class="tc-tasks">
+                  <div class="task-item done"><span class="task-dot"></span>Vision Transformer (ViT) implementation</div>
+                  <div class="task-item done"><span class="task-dot"></span>train_transformer.py pipeline</div>
+                  <div class="task-item progress"><span class="task-dot"></span>Model inference scripts</div>
+                  <div class="task-item pending"><span class="task-dot"></span>Store brain results</div>
+                  <div class="task-item pending"><span class="task-dot"></span>Model integration (API)</div>
+                  <div class="task-item progress"><span class="task-dot"></span>Reports &amp; presentations</div>
+                </div>
+              </div>
+              <div class="tc-accent"></div>
+            </div>
+
+            <div class="team-card">
+              <div class="tc-avatar">RR</div>
+              <div class="tc-info">
+                <h3 class="tc-name">Radhakanta Rana</h3>
+                <span class="tc-role">CNN Models &amp; Evaluation</span>
+                <div class="tc-tasks">
+                  <div class="task-item done"><span class="task-dot"></span>ResNet50 implementation</div>
+                  <div class="task-item done"><span class="task-dot"></span>train_cnn.py pipeline</div>
+                  <div class="task-item pending"><span class="task-dot"></span>metrics.py</div>
+                  <div class="task-item pending"><span class="task-dot"></span>confusion_matrix.py</div>
+                  <div class="task-item pending"><span class="task-dot"></span>Generate comparison plots</div>
+                  <div class="task-item progress"><span class="task-dot"></span>Dataset setup documentation</div>
+                </div>
+              </div>
+              <div class="tc-accent"></div>
+            </div>
+
+            <div class="team-card">
+              <div class="tc-avatar">BA</div>
+              <div class="tc-info">
+                <h3 class="tc-name">Bedangshi Acharya</h3>
+                <span class="tc-role">Preprocessing &amp; CNN Models</span>
+                <div class="tc-tasks">
+                  <div class="task-item done"><span class="task-dot"></span>dataset_organize.py</div>
+                  <div class="task-item done"><span class="task-dot"></span>dataset_split.py</div>
+                  <div class="task-item done"><span class="task-dot"></span>preprocess_images.py</div>
+                  <div class="task-item done"><span class="task-dot"></span>dataloader.py</div>
+                  <div class="task-item done"><span class="task-dot"></span>MobileNetV2 implementation</div>
+                  <div class="task-item done"><span class="task-dot"></span>train_cnn.py pipeline</div>
+                  <div class="task-item progress"><span class="task-dot"></span>Model inference scripts</div>
+                  <div class="task-item pending"><span class="task-dot"></span>Store breast results</div>
+                </div>
+              </div>
+              <div class="tc-accent"></div>
+            </div>
+
+          </div>
+
+          <div class="task-legend">
+            <span class="tl-item"><span class="tl-dot tl-done"></span>Completed</span>
+            <span class="tl-item"><span class="tl-dot tl-progress"></span>In Progress</span>
+            <span class="tl-item"><span class="tl-dot tl-pending"></span>Not Started</span>
+          </div>
+        </div>
+
+        <div class="about-disclaimer">
+          <div class="section-label">
+            <span class="sl-num">03</span>
+            Ethical Notice
+          </div>
+          <div class="disclaimer-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <div>
+              <strong>For Research and Educational Use Only</strong>
+              <p>OncoStream is an experimental research platform. All outputs, predictions, and confidence scores generated by this system are intended solely for academic investigation and educational demonstration. They do not constitute clinical diagnoses and must not be used as a substitute for professional medical evaluation. Any application of this system in clinical settings without proper regulatory approval and medical oversight is strictly discouraged.</p>
+            </div>
+          </div>
         </div>
 
       </div>
