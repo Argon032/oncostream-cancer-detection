@@ -19,6 +19,7 @@ RUN --mount=type=secret,id=KAGGLE_USERNAME \
     chmod 600 /root/.kaggle/kaggle.json && \
     mkdir -p results/brain results/breast && \
     kaggle datasets download -d argon03/oncostream-model-checkpoints --unzip -p /tmp/ckpts && \
+    find /tmp/ckpts -type f && \
     cp /tmp/ckpts/brain/vit_best.pth results/brain/vit_best.pth && \
     cp /tmp/ckpts/breast/resnet50_best.pth results/breast/resnet50_best.pth && \
     rm -rf /tmp/ckpts
