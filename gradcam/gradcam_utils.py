@@ -6,9 +6,6 @@ Grad-CAM visualisation for OncoStream.
     brain  → ViT      (hooks into last encoder block, 14x14 patch grid)
     breast → ResNet50 (hooks into layer4, 7x7 conv feature map)
 
-The core Grad-CAM logic is shared — only the hook location and feature
-map reshaping differ between the two architectures.
-
 Usage (standalone):
     from gradcam.gradcam_generator import generate_gradcam
     from PIL import Image
@@ -36,7 +33,7 @@ preprocess = transforms.Compose([
 
 CLASS_INFO = {
     "brain":  {"num_classes": 4,
-               "labels": ["glioma", "meningioma",  "no_tumor", "pituitary"]},
+               "labels": ["glioma", "meningioma", "no_tumor", "pituitary"]},
     "breast": {"num_classes": 2,
                "labels": ["benign", "malignant"]},
 }
@@ -48,29 +45,6 @@ MODEL_SELECTION = {
 }
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-
-#  Core Grad-CAM logic 
-def _compute_cam(features: torch.Tensor,
-                 grads: torch.Tensor) -> np.ndarray:
-    """
-    Given feature maps and their gradients (both in CxHxW format),
-    compute the normalised Grad-CAM activation map.
-
-    Args:
-        features: (C, H, W) feature map tensor.
-        grads:    (C, H, W) gradient tensor.
-
-    Returns:
-        cam: np.ndarray in [0, 1], shape (H, W).
-    """
-    weights = grads.mean(dim=(1, 2))                          # (C,)
-    cam     = (weights[:, None, None] * features).sum(dim=0)  # (H, W)
-    cam     = torch.relu(cam)
-    cam     = cam.detach().cpu().numpy()
-    if cam.max() > 0:
-        cam = cam / cam.max()
-    return cam
 
 
 def _overlay(image: Image.Image,
@@ -120,8 +94,16 @@ def _gradcam_vit(model: torch.nn.Module,
     h = w = int(f.shape[0] ** 0.5)   # 14
     f = f.reshape(h, w, -1).permute(2, 0, 1)  # (C, 14, 14)
     g = g.reshape(h, w, -1).permute(2, 0, 1)  # (C, 14, 14)
-
-    return _compute_cam(f, g), class_idx
+    
+    # GradCAM++ weights instead of simple mean
+    g_plus = torch.relu(g)
+    alpha = g_plus ** 2 / (2 * g_plus ** 2 + (f * g_plus ** 3).sum(dim=(1,2), keepdim=True) + 1e-7)
+    weights = (alpha * g_plus).sum(dim=(1, 2))
+    cam = torch.relu((weights[:, None, None] * f).sum(dim=0))
+    cam = cam.detach().cpu().numpy()
+    if cam.max() > 0:
+        cam = cam / cam.max()
+    return cam, class_idx
 
 
 #  ResNet50 Grad-CAM
@@ -156,7 +138,13 @@ def _gradcam_resnet(model: torch.nn.Module,
     f = features_store["out"][0]  # (2048, 7, 7)
     g = grads_store["out"][0]     # (2048, 7, 7)
 
-    return _compute_cam(f, g), class_idx
+    weights = grads.mean(dim=(1, 2))                          # (C,)
+    cam     = (weights[:, None, None] * features).sum(dim=0)  # (H, W)
+    cam     = torch.relu(cam)
+    cam     = cam.detach().cpu().numpy()
+    if cam.max() > 0:
+        cam = cam / cam.max()
+    return cam
 
 
 #  Model loader
