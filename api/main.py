@@ -51,6 +51,18 @@ app = FastAPI(
     version="1.0.0",
 )
 
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+import os
+
+# Serve frontend static files
+frontend_path = os.path.join(PROJECT_ROOT, "frontend")
+app.mount("/static", StaticFiles(directory=frontend_path), name="static")
+
+@app.get("/", response_class=FileResponse)
+def root():
+    return os.path.join(frontend_path, "index.html")
+
 # Allow all origins during development
 app.add_middleware(
     CORSMiddleware,
