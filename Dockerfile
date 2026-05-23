@@ -12,11 +12,10 @@ RUN pip install --no-cache-dir kaggle
 COPY . .
 
 # Download model checkpoints from Kaggle into the correct paths
-RUN --mount=type=secret,id=KAGGLE_USERNAME \
-    --mount=type=secret,id=KAGGLE_KEY \
+RUN --mount=type=secret,id=KAGGLE_KEY \
     mkdir -p /root/.kaggle && \
-    echo "{\"username\":\"$(cat /run/secrets/KAGGLE_USERNAME)\",\"key\":\"$(cat /run/secrets/KAGGLE_KEY)\"}" > /root/.kaggle/kaggle.json && \
-    chmod 600 /root/.kaggle/kaggle.json && \
+    cp /run/secrets/KAGGLE_KEY /root/.kaggle/access_token && \
+    chmod 600 /root/.kaggle/access_token && \
     mkdir -p results/brain results/breast && \
     kaggle datasets download -d argon03/oncostream-model-checkpoints --unzip -p /tmp/ckpts && \
     find /tmp/ckpts -type f && \
