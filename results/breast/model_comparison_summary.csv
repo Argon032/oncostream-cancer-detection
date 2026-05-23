@@ -1,5 +1,5 @@
 model,best_val_acc,final_train_acc,epochs_trained
-resnet50,0.9767,0.9925,15
-mobilenet,0.9783,0.9825,13
-vit,0.9783,0.9968,11
-swin,0.97,0.9782,15
+resnet50,0.9833,0.9957,25
+mobilenet,0.9817,0.9932,17
+vit,0.985,0.9996,20
+swin,0.975,0.9911,19

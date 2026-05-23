@@ -4,6 +4,9 @@ const previewImg = document.getElementById('preview-img');
 const previewName = document.getElementById('preview-name');
 const previewChange = document.getElementById('preview-change');
 
+// ── Replace with your HF Space URL once deployed ───────────────────────────
+const API_BASE = "https://argon032-oncostream.hf.space";
+
 let selectedFile = null;
 
 fileInput.addEventListener('change', (e) => {
@@ -48,24 +51,7 @@ document.querySelectorAll('.dataset-option').forEach(opt => {
   });
 });
 
-const CONFIGS = {
-  brain: {
-    label: 'Brain MRI',
-    classes: ['Glioma', 'Meningioma', 'Pituitary', 'No Tumor'],
-    probs: [0.914, 0.051, 0.022, 0.013],
-    topIdx: 0,
-    time: 218
-  },
-  breast: {
-    label: 'Breast Histopathology',
-    classes: ['Malignant', 'Benign'],
-    probs: [0.783, 0.217],
-    topIdx: 0,
-    time: 187
-  }
-};
-
-function runAnalysis() {
+async function runAnalysis() {
   if (!selectedFile) {
     const dz = document.getElementById('dropzone');
     dz.style.borderColor = 'var(--accent)';
@@ -82,41 +68,92 @@ function runAnalysis() {
   btn.querySelector('.btn-icon').innerHTML = '<div class="spinner"></div>';
   btn.querySelector('.btn-label').textContent = 'Running analysis…';
 
-  setTimeout(() => {
+  const datasetKey = document.querySelector('.dataset-option.selected').dataset.val;
+
+  const formData = new FormData();
+  formData.append('file', selectedFile);
+  formData.append('dataset', datasetKey);
+
+  const startTime = performance.now();
+
+  try {
+    const response = await fetch(`${API_BASE}/predict`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.detail || 'Prediction failed');
+    }
+
+    const data = await response.json();
+    const elapsed = Math.round(performance.now() - startTime);
+
+    showResult(data, datasetKey, elapsed);
+
+  } catch (err) {
+    alert(`Error: ${err.message}`);
+  } finally {
     btn.classList.remove('loading');
     btn.querySelector('.btn-icon').innerHTML = `
       <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
       </svg>`;
     btn.querySelector('.btn-label').textContent = 'Run Analysis';
-    showResult();
-  }, 2400);
+  }
 }
 
-function showResult() {
-  const datasetKey = document.querySelector('.dataset-option.selected').dataset.val;
-  const cfg = CONFIGS[datasetKey];
-  const now = new Date();
+function showResult(data, datasetKey, elapsed) {
+  const DATASET_LABELS = {
+    brain: 'Brain MRI',
+    breast: 'Breast Histopathology',
+  };
+  const MODEL_LABELS = {
+    vit: 'Vision Transformer (ViT)',
+    resnet50: 'ResNet-50',
+    mobilenet: 'MobileNetV2',
+    swin: 'Swin Transformer',
+  };
 
-  document.getElementById('r-dataset-badge').textContent = cfg.label;
+  const now = new Date();
+  const label = DATASET_LABELS[datasetKey] || datasetKey;
+
+  document.getElementById('r-dataset-badge').textContent = label;
   document.getElementById('r-timestamp').textContent =
     now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) +
     ' · ' + now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
 
-  const topClass = cfg.classes[cfg.topIdx];
-  const confPct = (cfg.probs[cfg.topIdx] * 100).toFixed(1) + '%';
+  const confidence = data.confidence; // already a percentage from backend
+  document.getElementById('r-diagnosis').textContent =
+    data.predicted_class.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  document.getElementById('r-dataset-label').textContent = label + ' Dataset';
+  document.getElementById('r-conf-val').textContent = confidence.toFixed(1) + '%';
+  document.getElementById('r-classes').textContent = Object.keys(data.all_probabilities).length;
+  document.getElementById('r-total-time').textContent = elapsed + 'ms';
+  document.getElementById('time-model').textContent = elapsed + 'ms';
 
-  document.getElementById('r-diagnosis').textContent = topClass;
-  document.getElementById('r-dataset-label').textContent = cfg.label + ' Dataset';
-  document.getElementById('r-conf-val').textContent = confPct;
-  document.getElementById('r-classes').textContent = cfg.classes.length;
-  document.getElementById('r-total-time').textContent = cfg.time + 'ms';
-  document.getElementById('time-model').textContent = cfg.time + 'ms';
+  // Update architecture label
+  const archCell = document.querySelector('.info-cell:nth-child(3) .info-cell-value');
+  if (archCell) archCell.textContent = MODEL_LABELS[data.model_used] || data.model_used;
 
-  buildProbList(document.getElementById('probs-model'), cfg.classes, cfg.probs, cfg.topIdx);
+  // Probability bars
+  const classes = Object.keys(data.all_probabilities);
+  const probs = Object.values(data.all_probabilities);
+  const topClass = data.predicted_class;
+  const topIdx = classes.indexOf(topClass);
+  buildProbList(document.getElementById('probs-model'), classes, probs, topIdx);
 
+  // Original image
   const imgSrc = previewImg.src;
   document.getElementById('r-original-img').src = imgSrc;
+
+  // GradCAM — use real image from backend if available, else fall back to canvas drawing
+  if (data.gradcam_image) {
+    renderGradcamFromBase64(data.gradcam_image);
+  } else {
+    drawHeatmap('heatmap-main');
+  }
 
   document.getElementById('page-upload').style.display = 'none';
   const rPage = document.getElementById('page-result');
@@ -125,13 +162,25 @@ function showResult() {
 
   requestAnimationFrame(() => {
     setTimeout(() => {
-      document.getElementById('conf-bar').style.width = (cfg.probs[cfg.topIdx] * 100) + '%';
+      document.getElementById('conf-bar').style.width = confidence + '%';
       document.querySelectorAll('.prob-bar-fill').forEach(bar => {
         bar.style.width = bar.dataset.w;
       });
-      drawHeatmap('heatmap-main');
     }, 120);
   });
+}
+
+function renderGradcamFromBase64(b64) {
+  const canvas = document.getElementById('heatmap-main');
+  const img = new Image();
+  img.onload = () => {
+    const container = canvas.parentElement;
+    canvas.width = container.offsetWidth || img.width;
+    canvas.height = container.offsetHeight || img.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  };
+  img.src = 'data:image/png;base64,' + b64;
 }
 
 function buildProbList(container, classes, probs, topIdx) {
@@ -142,7 +191,7 @@ function buildProbList(container, classes, probs, topIdx) {
     const item = document.createElement('div');
     item.className = 'prob-item';
     item.innerHTML = `
-      <span class="prob-name">${cls}</span>
+      <span class="prob-name">${cls.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>
       <div class="prob-bar-track">
         <div class="prob-bar-fill ${isTop ? 'top' : ''}" style="width:0%" data-w="${probs[i] * 100}%"></div>
       </div>
@@ -152,6 +201,7 @@ function buildProbList(container, classes, probs, topIdx) {
   });
 }
 
+// Fallback canvas heatmap if GradCAM not returned
 const HOTSPOT_CONFIGS = [
   { rx: 0.42, ry: 0.38, rr: 0.22, intensity: 1.0 },
   { rx: 0.58, ry: 0.52, rr: 0.14, intensity: 0.75 },
@@ -176,12 +226,9 @@ function drawHeatmap(canvasId) {
   ctx.globalAlpha = 1;
 
   HOTSPOT_CONFIGS.forEach(({ rx, ry, rr, intensity }) => {
-    const x = w * rx;
-    const y = h * ry;
-    const r = w * rr;
+    const x = w * rx, y = h * ry, r = w * rr;
     const grd = ctx.createRadialGradient(x, y, 0, x, y, r);
     const alpha = 0.74 * intensity;
-
     if (intensity >= 0.9) {
       grd.addColorStop(0, `rgba(255,215,0,${alpha})`);
       grd.addColorStop(0.28, `rgba(255,69,0,${alpha * 0.9})`);
@@ -196,7 +243,6 @@ function drawHeatmap(canvasId) {
       grd.addColorStop(0.6, `rgba(60,0,0,${alpha * 0.5})`);
       grd.addColorStop(1, `rgba(0,0,0,0)`);
     }
-
     ctx.fillStyle = grd;
     ctx.beginPath();
     ctx.arc(x, y, r, 0, Math.PI * 2);
@@ -218,16 +264,12 @@ function showPage(pageId) {
   const target = document.getElementById(pageId);
   if (target) {
     target.style.display = pageId === 'page-result' ? 'flex' : (pageId === 'page-upload' ? 'flex' : 'block');
-    if (pageId !== 'page-upload') {
-      target.classList.add('visible');
-    }
+    if (pageId !== 'page-upload') target.classList.add('visible');
   }
   document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
   const map = { 'page-upload': 0, 'page-about': 1 };
   const idx = map[pageId];
-  if (idx !== undefined) {
-    document.querySelectorAll('.nav-link')[idx]?.classList.add('active');
-  }
+  if (idx !== undefined) document.querySelectorAll('.nav-link')[idx]?.classList.add('active');
 }
 
 function downloadResult() {

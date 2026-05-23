@@ -9,3 +9,6 @@ scikit-learn
 pillow
 tqdm
 jupyter
+fastapi
+uvicorn
+python-multipart

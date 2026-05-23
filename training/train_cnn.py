@@ -199,7 +199,7 @@ def main():
 
     # LR scheduler: reduce on plateau
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer, mode="max", factor=0.5, patience=3, verbose=True
+        optimizer, mode="max", factor=0.5, patience=3
     )
 
     #  Training loop 
