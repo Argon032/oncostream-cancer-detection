@@ -130,7 +130,6 @@ async def predict(
         heatmap_image = generate_gradcam(
             image,
             dataset=dataset,
-            model_name=model_name,
             project_root=PROJECT_ROOT
         )
         buffer = io.BytesIO()
