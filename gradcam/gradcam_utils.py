@@ -36,7 +36,7 @@ preprocess = transforms.Compose([
 
 CLASS_INFO = {
     "brain":  {"num_classes": 4,
-               "labels": ["glioma", "meningioma", "pituitary", "no_tumor"]},
+               "labels": ["glioma", "meningioma",  "no_tumor", "pituitary"]},
     "breast": {"num_classes": 2,
                "labels": ["benign", "malignant"]},
 }
