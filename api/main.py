@@ -126,7 +126,7 @@ async def predict(
     # ── Grad-CAM ───────────────────────────────────────────────────────────────
     heatmap_b64 = None
     try:
-        from gradcam.gradcam_generator import generate_gradcam
+        from gradcam.gradcam_utils import generate_gradcam
         heatmap_image = generate_gradcam(
             image,
             dataset=dataset,

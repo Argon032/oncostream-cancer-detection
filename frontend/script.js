@@ -4,13 +4,19 @@ const previewImg = document.getElementById('preview-img');
 const previewName = document.getElementById('preview-name');
 const previewChange = document.getElementById('preview-change');
 
-// ── Replace with your HF Space URL once deployed ───────────────────────────
 const API_BASE = "https://argon032-oncostream.hf.space";
 
 let selectedFile = null;
 
+// ── File input ─────────────────────────────────────────────────────────────────
 fileInput.addEventListener('change', (e) => {
   if (e.target.files[0]) handleFile(e.target.files[0]);
+});
+
+// Fix: clicking anywhere on dropzone triggers file input
+dropzone.addEventListener('click', (e) => {
+  if (e.target === previewChange) return; // handled separately
+  fileInput.click();
 });
 
 dropzone.addEventListener('dragover', (e) => {
@@ -105,10 +111,7 @@ async function runAnalysis() {
 }
 
 function showResult(data, datasetKey, elapsed) {
-  const DATASET_LABELS = {
-    brain: 'Brain MRI',
-    breast: 'Breast Histopathology',
-  };
+  const DATASET_LABELS = { brain: 'Brain MRI', breast: 'Breast Histopathology' };
   const MODEL_LABELS = {
     vit: 'Vision Transformer (ViT)',
     resnet50: 'ResNet-50',
@@ -124,7 +127,7 @@ function showResult(data, datasetKey, elapsed) {
     now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) +
     ' · ' + now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
 
-  const confidence = data.confidence; // already a percentage from backend
+  const confidence = data.confidence;
   document.getElementById('r-diagnosis').textContent =
     data.predicted_class.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
   document.getElementById('r-dataset-label').textContent = label + ' Dataset';
@@ -133,22 +136,22 @@ function showResult(data, datasetKey, elapsed) {
   document.getElementById('r-total-time').textContent = elapsed + 'ms';
   document.getElementById('time-model').textContent = elapsed + 'ms';
 
-  // Update architecture label
   const archCell = document.querySelector('.info-cell:nth-child(3) .info-cell-value');
   if (archCell) archCell.textContent = MODEL_LABELS[data.model_used] || data.model_used;
 
-  // Probability bars
   const classes = Object.keys(data.all_probabilities);
   const probs = Object.values(data.all_probabilities);
-  const topClass = data.predicted_class;
-  const topIdx = classes.indexOf(topClass);
+  const topIdx = classes.indexOf(data.predicted_class);
   buildProbList(document.getElementById('probs-model'), classes, probs, topIdx);
 
-  // Original image
-  const imgSrc = previewImg.src;
-  document.getElementById('r-original-img').src = imgSrc;
+  // Set original image
+  document.getElementById('r-original-img').src = previewImg.src;
 
-  // GradCAM — use real image from backend if available, else fall back to canvas drawing
+  // Clear canvas before rendering new GradCAM
+  const canvas = document.getElementById('heatmap-main');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
   if (data.gradcam_image) {
     renderGradcamFromBase64(data.gradcam_image);
   } else {
@@ -172,12 +175,13 @@ function showResult(data, datasetKey, elapsed) {
 
 function renderGradcamFromBase64(b64) {
   const canvas = document.getElementById('heatmap-main');
+  const container = canvas.parentElement;
   const img = new Image();
   img.onload = () => {
-    const container = canvas.parentElement;
     canvas.width = container.offsetWidth || img.width;
     canvas.height = container.offsetHeight || img.height;
     const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
   };
   img.src = 'data:image/png;base64,' + b64;
@@ -201,7 +205,6 @@ function buildProbList(container, classes, probs, topIdx) {
   });
 }
 
-// Fallback canvas heatmap if GradCAM not returned
 const HOTSPOT_CONFIGS = [
   { rx: 0.42, ry: 0.38, rr: 0.22, intensity: 1.0 },
   { rx: 0.58, ry: 0.52, rr: 0.14, intensity: 0.75 },
@@ -215,16 +218,13 @@ function drawHeatmap(canvasId) {
   const w = container.offsetWidth;
   const h = container.offsetHeight;
   if (w === 0) return;
-
   canvas.width = w;
   canvas.height = h;
   const ctx = canvas.getContext('2d');
-
   const img = document.getElementById('r-original-img');
   ctx.globalAlpha = 0.42;
   ctx.drawImage(img, 0, 0, w, h);
   ctx.globalAlpha = 1;
-
   HOTSPOT_CONFIGS.forEach(({ rx, ry, rr, intensity }) => {
     const x = w * rx, y = h * ry, r = w * rr;
     const grd = ctx.createRadialGradient(x, y, 0, x, y, r);
@@ -254,6 +254,12 @@ function goBack() {
   document.getElementById('page-result').style.display = 'none';
   document.getElementById('page-result').classList.remove('visible');
   document.getElementById('page-upload').style.display = 'flex';
+  // Reset file selection for fresh upload
+  selectedFile = null;
+  previewImg.src = '';
+  previewName.textContent = '';
+  dropzone.classList.remove('has-file');
+  fileInput.value = '';
 }
 
 function showPage(pageId) {
@@ -278,7 +284,6 @@ function downloadResult() {
   const dataset = document.getElementById('r-dataset-badge').textContent;
   const ts = new Date().toLocaleString();
   const totalTime = document.getElementById('r-total-time').textContent;
-
   const lines = [
     'OncoStream — Analysis Report',
     '='.repeat(44),
@@ -296,7 +301,6 @@ function downloadResult() {
     'This output is not a clinical or medical diagnosis.',
     'Always consult a qualified medical professional.',
   ];
-
   const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -306,7 +310,8 @@ function downloadResult() {
 
 window.addEventListener('resize', () => {
   if (document.getElementById('page-result').style.display !== 'none') {
-    drawHeatmap('heatmap-main');
+    const canvas = document.getElementById('heatmap-main');
+    if (canvas.dataset.b64) renderGradcamFromBase64(canvas.dataset.b64);
   }
 });
 
