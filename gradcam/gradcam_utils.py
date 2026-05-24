@@ -1,13 +1,17 @@
 """
-gradcam_generator.py
----------------------
+gradcam_utils.py
+-----------------
 Grad-CAM visualisation for OncoStream.
 
     brain  → ViT      (hooks into last encoder block, 14x14 patch grid)
-    breast → ResNet50 (hooks into layer4, 7x7 conv feature map)
+    breast → ViT      (same — ViT used for both datasets)
+
+The core Grad-CAM logic is shared. Only the hook location and feature
+map reshaping differ between architectures. ResNet implementation is
+kept as a fallback if the deployment model changes.
 
 Usage (standalone):
-    from gradcam.gradcam_generator import generate_gradcam
+    from gradcam.gradcam_utils import generate_gradcam
     from PIL import Image
 
     heatmap = generate_gradcam(Image.open("scan.jpg"), dataset="brain")
@@ -41,18 +45,16 @@ CLASS_INFO = {
 # Which model handles each dataset
 MODEL_SELECTION = {
     "brain":  "vit",
-    "breast": "resnet50",
+    "breast": "vit",
 }
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
+# ── Heatmap overlay ────────────────────────────────────────────────────────────
 def _overlay(image: Image.Image,
              cam: np.ndarray,
              alpha: float = 0.45) -> Image.Image:
-    """
-    Resize cam to 224x224, apply JET colourmap, blend with original.
-    """
     cam_resized = cv2.resize(cam, (224, 224))
     heatmap     = cv2.applyColorMap(np.uint8(255 * cam_resized),
                                     cv2.COLORMAP_JET)
@@ -62,13 +64,13 @@ def _overlay(image: Image.Image,
     return Image.fromarray(overlay)
 
 
-#  ViT Grad-CAM 
+# ── ViT Grad-CAM ───────────────────────────────────────────────────────────────
 def _gradcam_vit(model: torch.nn.Module,
                  tensor: torch.Tensor,
                  class_idx: int = None):
     """
     Hook into the last encoder block (B, N, C).
-    Skip the class token, reshape 196 patch tokens → 14x14 spatial grid.
+    Skip class token, reshape 196 patch tokens → 14x14 spatial grid.
     """
     features_store = {}
 
@@ -76,9 +78,9 @@ def _gradcam_vit(model: torch.nn.Module,
         features_store["out"] = output
         output.retain_grad()
 
-    hook = model.encoder.layers[-1].register_forward_hook(forward_hook)
-
+    hook   = model.encoder.layers[-1].register_forward_hook(forward_hook)
     output = model(tensor)
+
     if class_idx is None:
         class_idx = output.argmax(dim=1).item()
 
@@ -86,27 +88,24 @@ def _gradcam_vit(model: torch.nn.Module,
     output[0, class_idx].backward()
     hook.remove()
 
-    feat  = features_store["out"]
-    # Skip class token → patch tokens (B, 196, C)
-    f = feat[0, 1:]            # (196, C)
-    g = feat.grad[0, 1:]       # (196, C)
+    feat = features_store["out"]
+    f    = feat[0, 1:]       # (196, C) — skip class token
+    g    = feat.grad[0, 1:]  # (196, C)
 
-    h = w = int(f.shape[0] ** 0.5)   # 14
+    h = w = int(f.shape[0] ** 0.5)  # 14
     f = f.reshape(h, w, -1).permute(2, 0, 1)  # (C, 14, 14)
     g = g.reshape(h, w, -1).permute(2, 0, 1)  # (C, 14, 14)
-    
-    # GradCAM++ weights instead of simple mean
-    g_plus = torch.relu(g)
-    alpha = g_plus ** 2 / (2 * g_plus ** 2 + (f * g_plus ** 3).sum(dim=(1,2), keepdim=True) + 1e-7)
-    weights = (alpha * g_plus).sum(dim=(1, 2))
-    cam = torch.relu((weights[:, None, None] * f).sum(dim=0))
-    cam = cam.detach().cpu().numpy()
+
+    weights = g.mean(dim=(1, 2))
+    cam     = torch.relu((weights[:, None, None] * f).sum(dim=0))
+    cam     = cam.detach().cpu().numpy()
     if cam.max() > 0:
         cam = cam / cam.max()
+
     return cam, class_idx
 
 
-#  ResNet50 Grad-CAM
+# ── ResNet50 Grad-CAM (fallback) ───────────────────────────────────────────────
 def _gradcam_resnet(model: torch.nn.Module,
                     tensor: torch.Tensor,
                     class_idx: int = None):
@@ -127,6 +126,7 @@ def _gradcam_resnet(model: torch.nn.Module,
     bhook  = target.register_full_backward_hook(backward_hook)
 
     output = model(tensor)
+
     if class_idx is None:
         class_idx = output.argmax(dim=1).item()
 
@@ -138,16 +138,16 @@ def _gradcam_resnet(model: torch.nn.Module,
     f = features_store["out"][0]  # (2048, 7, 7)
     g = grads_store["out"][0]     # (2048, 7, 7)
 
-    weights = grads.mean(dim=(1, 2))                          # (C,)
-    cam     = (weights[:, None, None] * features).sum(dim=0)  # (H, W)
-    cam     = torch.relu(cam)
+    weights = g.mean(dim=(1, 2))
+    cam     = torch.relu((weights[:, None, None] * f).sum(dim=0))
     cam     = cam.detach().cpu().numpy()
     if cam.max() > 0:
         cam = cam / cam.max()
-    return cam
+
+    return cam, class_idx
 
 
-#  Model loader
+# ── Model loader ───────────────────────────────────────────────────────────────
 def _load_model(model_name: str, dataset: str, project_root: str):
     num_classes = CLASS_INFO[dataset]["num_classes"]
 
@@ -177,7 +177,8 @@ def _load_model(model_name: str, dataset: str, project_root: str):
     model.to(DEVICE)
     return model
 
-#  Public interface
+
+# ── Public interface ───────────────────────────────────────────────────────────
 def generate_gradcam(image,
                      dataset: str,
                      project_root: str = ".",
@@ -220,7 +221,7 @@ if __name__ == "__main__":
     output_path = _sys.argv[3] if len(_sys.argv) > 3 else "gradcam_output.png"
 
     if img_path is None:
-        print("Usage: python gradcam_generator.py <image_path> "
+        print("Usage: python gradcam_utils.py <image_path> "
               "<brain|breast> [output_path]")
         _sys.exit(1)
 

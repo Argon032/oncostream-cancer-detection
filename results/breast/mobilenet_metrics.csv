@@ -1,4 +1,4 @@
-class,precision,recall,f1,support
-benign,0.9799,0.9767,0.9783,300
-malignant,0.9767,0.98,0.9784,300
-macro avg,0.9783,0.9783,0.9783,600
+class,precision,recall,f1,auc,support
+benign,0.9737,0.9867,0.9801,0.998,300
+malignant,0.9865,0.9733,0.9799,0.998,300
+macro avg,0.9801,0.98,0.98,0.998,600

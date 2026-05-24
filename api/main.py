@@ -9,7 +9,12 @@ Exposes a single endpoint:
         - Returns predicted class, confidence, per-class probabilities,
           and a Grad-CAM heatmap as a base64-encoded PNG string
 
+Model selection (based on evaluation results):
+    brain  → ViT (best macro F1: 0.9560, macro AUC: 0.9846)
+    breast → ViT (best macro AUC: 0.9994, macro F1: 0.9883)
+
 HOW TO RUN
+----------
 Install dependencies:
     pip install fastapi uvicorn python-multipart pillow
 
@@ -28,6 +33,7 @@ import sys
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from PIL import Image
 
 # ── Project root ───────────────────────────────────────────────────────────────
@@ -35,23 +41,23 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, PROJECT_ROOT)
 
 # ── Model selection per dataset ────────────────────────────────────────────────
-# Update these if the selected model changes.
+# To change the deployed model, update the value here.
+# The inference script and Grad-CAM will both follow this automatically.
 MODEL_SELECTION = {
-    "brain":  "vit",       # ViT — best F1 on brain MRI
-    "breast": "resnet50",  # ResNet50 — best F1 on breast histopathology
+    "brain":  "vit",
+    "breast": "vit",
 }
 
 app = FastAPI(
     title="OncoStream API",
     description=(
         "Cancer detection API. "
-        "Uses ViT for brain MRI classification and ResNet50 for breast "
-        "histopathology, with Grad-CAM explainability overlays."
+        "Uses Vision Transformer (ViT) for both brain MRI and breast "
+        "histopathology classification, with Grad-CAM explainability overlays."
     ),
     version="1.0.0",
 )
 
-# Allow all origins during development
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -62,34 +68,25 @@ app.add_middleware(
 VALID_DATASETS = {"brain", "breast"}
 
 
+@app.get("/")
+def root():
+    return {
+        "message": "OncoStream API is running. POST to /predict to classify an image.",
+        "models":  MODEL_SELECTION,
+    }
+
+
 @app.post("/predict")
 async def predict(
     file:    UploadFile = File(...),
     dataset: str        = Form(...),
 ):
-    """
-    Classify a medical image and return Grad-CAM explainability.
-
-    Form fields:
-        file    — image file (JPEG, PNG, etc.)
-        dataset — 'brain' or 'breast'
-
-    Returns:
-        predicted_class   : str   — e.g. "glioma"
-        confidence        : float — e.g. 94.21 (as a percentage)
-        all_probabilities : dict  — {class_label: probability}
-        gradcam_image     : str   — base64-encoded PNG of heatmap overlay
-        dataset           : str   — echoed back for frontend use
-        model_used        : str   — which model produced the result
-    """
-    # ── Validate dataset ───────────────────────────────────────────────────────
     if dataset not in VALID_DATASETS:
         raise HTTPException(
             status_code=400,
             detail=f"Invalid dataset '{dataset}'. Choose 'brain' or 'breast'."
         )
 
-    # ── Read image ─────────────────────────────────────────────────────────────
     try:
         contents = await file.read()
         image    = Image.open(io.BytesIO(contents)).convert("RGB")
@@ -136,7 +133,6 @@ async def predict(
         heatmap_image.save(buffer, format="PNG")
         heatmap_b64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
     except Exception as e:
-        # Grad-CAM failure does not block the prediction result
         print(f"[WARNING] Grad-CAM failed: {e}")
 
     return JSONResponse({
@@ -148,9 +144,9 @@ async def predict(
         "model_used":        model_name,
     })
 
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
-import os
 
+# ── Serve frontend ─────────────────────────────────────────────────────────────
 frontend_path = os.path.join(PROJECT_ROOT, "frontend")
-app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
+if os.path.isdir(frontend_path):
+    app.mount("/", StaticFiles(directory=frontend_path, html=True),
+              name="frontend")
