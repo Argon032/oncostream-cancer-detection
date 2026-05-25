@@ -68,14 +68,6 @@ app.add_middleware(
 VALID_DATASETS = {"brain", "breast"}
 
 
-@app.get("/")
-def root():
-    return {
-        "message": "OncoStream API is running. POST to /predict to classify an image.",
-        "models":  MODEL_SELECTION,
-    }
-
-
 @app.post("/predict")
 async def predict(
     file:    UploadFile = File(...),
