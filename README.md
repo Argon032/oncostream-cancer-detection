@@ -209,9 +209,12 @@ Working Interface - [OncoStream](https://huggingface.co/spaces/Argon032/oncostre
 
 | Name | Responsibility |
 |---|---|
-| Dr. Amrutanshu Panigrahi | Supervisor |
 | Arunima (Lead) | Swin Transformer · Training pipeline · Attention Rollout |
 | Bedangshi | MobileNetV2 · Breast dataset pipeline · Preprocessing |
 | Symantak | Frontend · API integration · Dataset pipeline |
 | Samikshya | Vision Transformer (ViT) · Brain dataset training execution |
 | Radhakanta | ResNet50 · Evaluation scripts · Literature survey |
+
+Supervised by Dr. Amrutanshu Panigrahi
+
+*This project was developed as a Final Year Research Project (FYRP) for the Bachelor of Technology in Computer Science and Engineering programme at Siksha 'O' Anusandhan (Deemed to be) University, Bhubaneswar, Odisha, India (2025–2026).*
