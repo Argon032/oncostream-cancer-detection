@@ -204,6 +204,8 @@ The deployed model is ViT for both datasets. To change this, update `MODEL_SELEC
 
 ! Deployed model
 
+Working Interface - [OncoStream](https://huggingface.co/spaces/Argon032/oncostream)
+
 ## Team
 
 | Name | Responsibility |
