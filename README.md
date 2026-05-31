@@ -43,10 +43,9 @@ oncostream-cancer-detection/
 │   ├── confusion_matrix.py     # Confusion matrix plots
 │   └── compare_models.py       # Cross-model comparison plots and summary
 ├── gradcam/
-│   ├── gradcam_utils.py        # Attention Rollout (ViT) — used by live API
-│   └── __init__.py
+│   └── gradcam_utils.py        # Attention Rollout (ViT) - used by live API
 ├── api/
-│   └── main.py                 # FastAPI backend — POST /predict
+│   └── main.py                 # FastAPI backend - POST /predict
 ├── frontend/                   # Web UI
 ├── results/
 │   ├── brain/                  # Checkpoints + CSVs go here after training
@@ -68,16 +67,16 @@ pip install -r requirements.txt
 Datasets are not included in the repo. Download and set up manually:
 
 **Brain MRI**
-1. Download from [Kaggle — Brain Tumor MRI Dataset](https://www.kaggle.com/datasets/masoudnickparvar/brain-tumor-mri-dataset)
-2. Extract into `datasets/brain/` — the Kaggle download comes pre-split into `Training/` and `Testing/` folders
+1. Download from [Kaggle - Brain Tumor MRI Dataset](https://www.kaggle.com/datasets/masoudnickparvar/brain-tumor-mri-dataset)
+2. Extract into `datasets/brain/` - the Kaggle download comes pre-split into `Training/` and `Testing/` folders
 3. Run `dataset_split.py` to create the `val/` split:
 ```bash
 python preprocessing/dataset_split.py
 ```
 
 **Breast Histopathology**
-1. Download from [Kaggle — BreaKHis](https://www.kaggle.com/datasets/ambarish/breakhis)
-2. Extract into `datasets/breast/` — the download has a nested folder structure
+1. Download from [Kaggle - BreaKHis](https://www.kaggle.com/datasets/ambarish/breakhis)
+2. Extract into `datasets/breast/` - the download has a nested folder structure
 3. Run `dataset_organize.py` first to flatten it, then `dataset_split.py`:
 ```bash
 python preprocessing/dataset_organize.py
@@ -100,7 +99,7 @@ Training is designed to run on **Google Colab or Kaggle** (GPU required). A pre-
 
 **[OncoStream Training Notebook](https://colab.research.google.com/drive/1OXB5E8IeuW6QzWvQSMqc_V73fhQUmIDi?usp=sharing)**
 
-The notebook runs cells sequentially — no additional configuration needed setting the `project_root` path and kaggle API key.
+The notebook runs cells sequentially - no additional configuration needed setting the `project_root` path and kaggle API key.
 
 **To train manually**, edit the `CONFIG` block at the top of the relevant script and run:
 
@@ -116,7 +115,7 @@ Key CONFIG options:
 ```python
 "model_name":  "vit"       # vit / swin / resnet50 / mobilenet
 "dataset":     "brain"     # brain / breast
-"project_root": "."        # update to your Drive path on Colab
+"project_root": "."        # update to your project root path on Colab
 ```
 
 Checkpoints are saved automatically to `results/{dataset}/{model}_best.pth`.
@@ -210,6 +209,7 @@ Working Interface - [OncoStream](https://huggingface.co/spaces/Argon032/oncostre
 
 | Name | Responsibility |
 |---|---|
+| Dr. Amrutanshu Panigrahi | Supervisor |
 | Arunima (Lead) | Swin Transformer · Training pipeline · Attention Rollout |
 | Bedangshi | MobileNetV2 · Breast dataset pipeline · Preprocessing |
 | Symantak | Frontend · API integration · Dataset pipeline |
